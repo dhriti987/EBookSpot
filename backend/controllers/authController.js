@@ -34,7 +34,7 @@ exports.signUp = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
     if (!user) {
       return next(new AppError("Email or Password is Invalid", 400));
     }
@@ -43,9 +43,11 @@ exports.login = async (req, res, next) => {
       return next(new AppError("Email or Password is Invalid", 400));
     }
     const token = generateToken(user._id);
+    user.password = undefined;
     res.status(200).send({
       status: "success",
       token: token,
+      user,
     });
   } catch (err) {
     return next(new AppError("Something went Wronge", 500));
